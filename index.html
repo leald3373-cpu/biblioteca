@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Biblioteca - Gestão do Acervo</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Alerta Toaster -->
+  <div id="toast" class="toast hidden">
+    <span id="toast-message">Notificação</span>
+  </div>
+
+  <!-- Cabeçalho / Navegação -->
+  <header class="navbar">
+    <div class="logo">
+      <span class="icon">📖</span>
+      <div>
+        <h1>Biblioteca Central</h1>
+        <small>Sistema de Gestão de Acervo</small>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <button class="nav-btn active" data-page="home">🏠 Início</button>
+      <button class="nav-btn" data-page="livros">📚 Acervo de Livros</button>
+      <button class="nav-btn" data-page="usuarios">👤 Leitores & Usuários</button>
+      <button class="nav-btn" data-page="emprestimos">🤝 Novo Empréstimo</button>
+      <button class="nav-btn" data-page="historico">📜 Histórico & Prazos</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- ========================================== -->
+    <!-- PÁGINA 1: DASHBOARD / INÍCIO               -->
+    <!-- ========================================== -->
+    <section id="page-home" class="page-view active">
+      <div class="welcome-banner">
+        <h2>Painel de Controle da Biblioteca</h2>
+        <p>Acompanhe o status das obras, empréstimos ativos e leitores cadastrados em tempo real.</p>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="stats-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total de Obras</div>
+          <div class="kpi-value" id="kpi-total-livros">0</div>
+          <div class="kpi-sub">Títulos no catálogo</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Exemplares Livres</div>
+          <div class="kpi-value positive" id="kpi-livros-disponiveis">0</div>
+          <div class="kpi-sub">Prontos para empréstimo</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Empréstimos Ativos</div>
+          <div class="kpi-value warning" id="kpi-emprestimos-ativos">0</div>
+          <div class="kpi-sub">Livros em circulação</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Em Atraso</div>
+          <div class="kpi-value danger" id="kpi-emprestimos-atrasados">0</div>
+          <div class="kpi-sub">Prazo estourado</div>
+        </div>
+      </div>
+
+      <!-- Atalhos Rápidos -->
+      <div class="quick-actions">
+        <h3>Acesso Rápido</h3>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="irParaPagina('emprestimos')">➕ Registrar Novo Empréstimo</button>
+          <button class="btn btn-secondary" onclick="irParaPagina('livros')">📚 Cadastrar Novo Livro</button>
+          <button class="btn btn-secondary" onclick="irParaPagina('usuarios')">👤 Cadastrar Novo Usuário</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PÁGINA 2: GESTÃO DE LIVROS                 -->
+    <!-- ========================================== -->
+    <section id="page-livros" class="page-view">
+      <div class="grid-2col">
+        <!-- Formulário -->
+        <div class="card">
+          <h2>Cadastrar Novo Livro</h2>
+          <p class="subtitle">Adicione novas obras ao acervo do sistema.</p>
+
+          <form id="form-livro">
+            <div class="form-group">
+              <label for="livro-titulo">Título da Obra</label>
+              <input type="text" id="livro-titulo" placeholder="Ex: Dom Casmurro" required>
+            </div>
+
+            <div class="form-group">
+              <label for="livro-autor">Autor(a)</label>
+              <input type="text" id="livro-autor" placeholder="Ex: Machado de Assis" required>
+            </div>
+
+            <div class="grid-2col-compact">
+              <div class="form-group">
+                <label for="livro-genero">Gênero Literário</label>
+                <select id="livro-genero" required>
+                  <option value="">Selecione...</option>
+                  <option value="Romance">Romance</option>
+                  <option value="Ficção Científica">Ficção Científica</option>
+                  <option value="Fantasia">Fantasia</option>
+                  <option value="História / Biografia">História / Biografia</option>
+                  <option value="Poesia">Poesia</option>
+                  <option value="Filosofia / Ensaio">Filosofia / Ensaio</option>
+                  <option value="Técnico / Acadêmico">Técnico / Acadêmico</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="livro-ano">Ano de Publicação</label>
+                <input type="number" id="livro-ano" placeholder="Ex: 1899" min="1000" max="2030" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="livro-quantidade">Quantidade de Exemplares</label>
+              <input type="number" id="livro-quantidade" min="1" value="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary full">Adicionar Obra ao Acervo</button>
+          </form>
+        </div>
+
+        <!-- Tabela do Acervo -->
+        <div class="card">
+          <h2>Acervo Cadastrado</h2>
+          <p class="subtitle">Livros atualmente disponíveis na biblioteca.</p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Autor</th>
+                  <th>Gênero</th>
+                  <th>Disponíveis</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-livros">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PÁGINA 3: GESTÃO DE USUÁRIOS               -->
+    <!-- ========================================== -->
+    <section id="page-usuarios" class="page-view">
+      <div class="grid-2col">
+        <!-- Formulário -->
+        <div class="card">
+          <h2>Cadastrar Novo Leitor</h2>
+          <p class="subtitle">Registre leitores para liberação de empréstimos.</p>
+
+          <form id="form-usuario">
+            <div class="form-group">
+              <label for="usuario-nome">Nome Completo</label>
+              <input type="text" id="usuario-nome" placeholder="Ex: Ana Maria Silva" required>
+            </div>
+
+            <div class="form-group">
+              <label for="usuario-documento">Documento (CPF / Matrícula)</label>
+              <input type="text" id="usuario-documento" placeholder="Ex: 123.456.789-00" required>
+            </div>
+
+            <div class="form-group">
+              <label for="usuario-tipo">Tipo de Matrícula</label>
+              <select id="usuario-tipo" required>
+                <option value="Estudante">Estudante</option>
+                <option value="Professor">Professor</option>
+                <option value="Comunitário">Comunitário</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary full">Cadastrar Leitor</button>
+          </form>
+        </div>
+
+        <!-- Tabela de Usuários -->
+        <div class="card">
+          <h2>Leitores Cadastrados</h2>
+          <p class="subtitle">Usuários habilitados para pegar obras emprestadas.</p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Matrícula / Doc</th>
+                  <th>Tipo</th>
+                  <th>Empréstimos Ativos</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-usuarios">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PÁGINA 4: NOVO EMPRÉSTIMO                  -->
+    <!-- ========================================== -->
+    <section id="page-emprestimos" class="page-view">
+      <div class="card max-w-700">
+        <h2>Registrar Novo Empréstimo</h2>
+        <p class="subtitle">Associe um exemplar disponível a um leitor cadastrado. O prazo padrão é de 14 dias.</p>
+
+        <form id="form-emprestimo">
+          <div class="form-group">
+            <label for="select-livro">Selecione o Livro</label>
+            <select id="select-livro" required>
+              <option value="">Carregando acervo...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="select-usuario">Selecione o Leitor</label>
+            <select id="select-usuario" required>
+              <option value="">Carregando leitores...</option>
+            </select>
+          </div>
+
+          <!-- Resumo da Transação -->
+          <div class="summary-box">
+            <div class="summary-item">
+              <span>Prazo de devolução:</span>
+              <strong>14 dias corridos</strong>
+            </div>
+            <div class="summary-item">
+              <span>Data de devolução prevista:</span>
+              <strong id="preview-data-devolucao">--/--/----</strong>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary full">Confirmar Empréstimo</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PÁGINA 5: HISTÓRICO & PRAZOS               -->
+    <!-- ========================================== -->
+    <section id="page-historico" class="page-view">
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <h2>Histórico Geral de Empréstimos</h2>
+            <p class="subtitle">Acompanhe todas as saídas, prazos de devolução e renovações.</p>
+          </div>
+
+          <!-- Filtros e Ações -->
+          <div class="actions-bar">
+            <input type="text" id="input-busca" placeholder="🔍 Buscar por livro, autor ou usuário...">
+            <select id="filtro-status">
+              <option value="TODOS">Todos os Status</option>
+              <option value="Em aberto">Em aberto</option>
+              <option value="Atrasado">Atrasado</option>
+              <option value="Devolvido">Devolvido</option>
+            </select>
+            <button class="btn btn-secondary" onclick="exportarCSV()">📥 Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Livro</th>
+                <th>Autor</th>
+                <th>Leitor</th>
+                <th>Data Empréstimo</th>
+                <th>Prazo Devolução</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-historico">
+              <!-- Preenchido via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
